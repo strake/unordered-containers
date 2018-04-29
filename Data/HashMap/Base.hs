@@ -199,21 +199,13 @@ instance Functor (HashMap k) where
 instance Foldable.Foldable (HashMap k) where
     foldr f = foldrWithKey (const f)
 
-#if __GLASGOW_HASKELL__ >= 711
-instance (Eq k, Hashable k) => Semigroup (HashMap k v) where
-  (<>) = union
+instance (Eq k, Hashable k, Semigroup v) => Semigroup (HashMap k v) where
+  (<>) = unionWith (<>)
   {-# INLINE (<>) #-}
-#endif
 
-instance (Eq k, Hashable k) => Monoid (HashMap k v) where
+instance (Eq k, Hashable k, Semigroup v) => Monoid (HashMap k v) where
   mempty = empty
   {-# INLINE mempty #-}
-#if __GLASGOW_HASKELL__ >= 711
-  mappend = (<>)
-#else
-  mappend = union
-#endif
-  {-# INLINE mappend #-}
 
 instance (Data k, Data v, Eq k, Hashable k) => Data (HashMap k v) where
     gfoldl f z m   = z fromList `f` toList m
